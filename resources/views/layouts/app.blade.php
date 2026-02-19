@@ -159,6 +159,39 @@
         @yield('content')
     </div>
 
+    <!-- Floating Voice Search Setup -->
+    <div class="position-fixed bottom-0 end-0 p-4" style="z-index: 1050; margin-bottom: 80px; display: none;">
+        <button id="floating-voice-btn"
+            class="btn btn-warning rounded-circle shadow-lg d-flex align-items-center justify-content-center"
+            style="width: 60px; height: 60px; transition: transform 0.2s;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                class="bi bi-mic-fill text-dark" viewBox="0 0 16 16">
+                <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z" />
+                <path
+                    d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-5 5V14h2a.5.5 0 0 1 0 1H6a.5.5 0 0 1 0-1h2v-1a5 5 0 0 1-5-5V7a.5.5 0 0 1 .5-.5z" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Voice Listening Modal/Overlay -->
+    <div id="voice-overlay"
+        class="position-fixed top-0 start-0 w-100 h-100 d-none flex-column align-items-center justify-content-center"
+        style="background: rgba(0,0,0,0.85); z-index: 2000; backdrop-filter: blur(5px);">
+        <div class="text-center text-white">
+            <div class="spinner-grow text-warning mb-4" role="status" style="width: 4rem; height: 4rem;">
+                <span class="visually-hidden">Listening...</span>
+            </div>
+            <h2 class="fw-bold mb-3">I'm Listening...</h2>
+            <p class="lead mb-4">Try saying "Sofa under 10000" or "Wooden Table"</p>
+            <button id="stop-voice-btn" class="btn btn-outline-light rounded-pill px-4">Cancel</button>
+        </div>
+
+        <!-- Hidden Search Form -->
+        <form action="{{ route('products.index') }}" method="GET" id="voice-search-form">
+            <input type="hidden" name="search" id="hidden-voice-input">
+        </form>
+    </div>
+
     <!-- Footer -->
     <footer class="py-5 mt-5">
         <div class="container">
@@ -245,6 +278,82 @@
     </script>
     @yield('scripts')
     @stack('scripts')
+    <script>
+        // Floating Voice Search Logic
+        const floatingBtn = document.getElementById('floating-voice-btn');
+        const overlay = document.getElementById('voice-overlay');
+        const stopBtn = document.getElementById('stop-voice-btn');
+        const hiddenInput = document.getElementById('hidden-voice-input');
+        const voiceForm = document.getElementById('voice-search-form');
+
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+
+            // Start Listening
+            floatingBtn.addEventListener('click', () => {
+                overlay.classList.remove('d-none');
+                overlay.classList.add('d-flex');
+                recognition.start();
+            });
+
+            // Stop/Cancel
+            stopBtn.addEventListener('click', () => {
+                recognition.stop();
+                overlay.classList.add('d-none');
+                overlay.classList.remove('d-flex');
+            });
+
+            // On Result
+            recognition.onresult = (event) => {
+                const rawTranscript = event.results[0][0].transcript.trim();
+
+                // Deduplicate repeated words (e.g. "Sofa Sofa Sofa" → "Sofa")
+                const words = rawTranscript.split(/\s+/);
+                const seen = new Set();
+                const uniqueWords = [];
+                for (const word of words) {
+                    const lower = word.toLowerCase();
+                    if (!seen.has(lower)) {
+                        seen.add(lower);
+                        uniqueWords.push(word);
+                    }
+                }
+                const cleanedTranscript = uniqueWords.join(' ');
+
+                // Show visual feedback
+                overlay.innerHTML = `
+                    <div class="text-center text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-check-circle-fill text-success mb-3" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        <h3 class="fw-bold">Searching: "${cleanedTranscript}"...</h3>
+                    </div>
+                `;
+
+                // Redirect instantly to search results
+                const searchUrl = `{{ route('products.index') }}?search=${encodeURIComponent(cleanedTranscript)}`;
+                window.location.href = searchUrl;
+            };
+
+            // On Error or End
+            recognition.onerror = (event) => {
+                console.error("Voice error", event.error);
+                overlay.classList.add('d-none');
+                overlay.classList.remove('d-flex');
+                alert("Could not hear you. Please try again.");
+            };
+
+            recognition.onend = () => {
+                // Usually we keep overlay open until result or manual close, but if no result, maybe close?
+                // For now, let's leave it to user to cancel or re-click if it timed out silently.
+            };
+
+        } else {
+            floatingBtn.style.display = 'none'; // Hide if not supported
+        }
+    </script>
 </body>
 
 </html>

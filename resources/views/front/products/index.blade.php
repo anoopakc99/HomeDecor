@@ -22,7 +22,13 @@
             <!-- Product Grid -->
             <div class="col-md-9">
                 <h2 class="mb-4">
-                    {{ request('category') ? ucwords(str_replace('-', ' ', request('category'))) : 'All Products' }}
+                    @if(request('search'))
+                        Search results for: <em>"{{ request('search') }}"</em>
+                    @elseif(request('category'))
+                        {{ ucwords(str_replace('-', ' ', request('category'))) }}
+                    @else
+                        All Products
+                    @endif
                 </h2>
 
                 @if($products->count() > 0)
@@ -38,7 +44,13 @@
                         {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
                     </div>
                 @else
-                    <div class="alert alert-info">No products found in this category.</div>
+                    <div class="alert alert-info">
+                        @if(request('search'))
+                            No products found for <strong>"{{ request('search') }}"</strong>. Try a different keyword.
+                        @else
+                            No products found in this category.
+                        @endif
+                    </div>
                 @endif
             </div>
         </div>
