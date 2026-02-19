@@ -76,16 +76,44 @@
             </div>
         </div>
 
-        @if($related->count() > 0)
-            <div class="mt-5 pt-5 border-top">
-                <h3 class="mb-5 text-center display-6">You Might Also Like</h3>
-                <div class="row g-4">
-                    @foreach($related as $rel)
-                        <div class="col-md-3">
-                            @include('front.products.card', ['product' => $rel])
-                        </div>
-                    @endforeach
+        @if(isset($related) && $related->count() > 0)
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h3 class="display-6 fw-bold mb-4 text-center">Similar Products</h3>
+                    <p class="text-center text-muted mb-5">Handpicked recommendations for your taste</p> 
                 </div>
+                @foreach($related as $prod)
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100 border-0 shadow-sm product-card">
+                            <div class="position-relative overflow-hidden">
+                                <a href="{{ route('products.show', $prod->slug) }}">
+                                    @php
+                                        $image = $prod->image;
+                                        if ($image && !Str::startsWith($image, 'http')) {
+                                            $image = asset('storage/' . $image);
+                                        } elseif (!$image) {
+                                            $image = 'https://via.placeholder.com/300x300';
+                                        }
+                                    @endphp
+                                    <img src="{{ $image }}" class="card-img-top" alt="{{ $prod->name }}" style="height: 250px; object-fit: cover;">
+                                </a>
+                                @if($prod->price < 5000)
+                                    <div class="position-absolute top-0 start-0 bg-primary text-white px-2 py-1 m-2 small fw-bold rounded">
+                                        Best Value
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="card-body text-center">
+                                <h5 class="card-title fw-bold font-monospace">
+                                    <a href="{{ route('products.show', $prod->slug) }}" class="text-decoration-none text-dark">
+                                        {{ $prod->name }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-gold fw-bold">₹{{ number_format($prod->price) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         @endif
     </div>

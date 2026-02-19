@@ -29,15 +29,12 @@ class ProductController extends Controller
         return view('front.products.index', compact('products', 'categories'));
     }
 
-    public function show($slug)
+    public function show($slug, \App\Services\RecommendationService $recommendationService)
     {
         $product = Product::with(['category.parent', 'images'])->where('slug', $slug)->firstOrFail();
 
-        $related = Product::with('category')
-            ->where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->take(4)
-            ->get();
+        // Use the AI Service for Recommendations
+        $related = $recommendationService->getRelatedProducts($product);
 
         return view('front.products.show', compact('product', 'related'));
     }
