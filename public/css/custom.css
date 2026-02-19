@@ -1,0 +1,148 @@
+:root {
+    --bg-white: #ffffff;
+    --text-black: #1a1a1a;
+    --text-grey: #555555;
+    --wood-accent: #8b5a2b;
+    --color-gold: #c5a059; /* Premium gold accent */
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: var(--bg-white);
+    color: var(--text-black);
+    font-family: var(--font-body);
+    font-size: 16px; /* Slightly refined base for readability */
+    font-weight: 400;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600; /* Bold headings for impact */
+    letter-spacing: 0.5px;
+    color: var(--text-black);
+    margin-bottom: 1rem;
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--bg-white);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text-black) !important;
+}
+
+.nav-link {
+    color: var(--text-black) !important;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    margin-left: 2rem;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--text-black);
+    border: 1px solid var(--text-black);
+    color: var(--bg-white);
+    padding: 1rem 3rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 0;
+    font-size: 0.9rem;
+}
+
+.btn-primary:hover {
+    background-color: var(--bg-white);
+    color: var(--text-black);
+    padding: 1rem 3rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 0;
+    font-size: 0.9rem;
+}
+
+/* Product Cards */
+.card {
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    height: 400px; /* Taller aspect ratio for luxury feel */
+    object-fit: cover;
+    filter: grayscale(20%);
+    transition: filter 0.3s;
+}
+
+.card:hover .card-img-top {
+    filter: grayscale(0%);
+}
+
+.card-title a {
+    color: var(--text-black);
+    font-family: var(--font-heading);
+}
+
+.card-text {
+    color: var(--wood-accent);
+    font-family: var(--font-body);
+}
+
+/* Hero */
+.hero {
+    background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://loremflickr.com/1920/900/wood,craft,furniture/all');
+    /* ideally this url would be a real image */
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 180px 0;
+}
+
+/* Footer */
+footer {
+    background-color: #f9f9f9;
+    color: var(--text-black);
+    border-top: 1px solid #eee;
+    padding: 4rem 0;
+}
+
+footer h5 {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+}
+
+
+/* Custom Utilities */
+.text-gold {
+    color: var(--color-gold) !important;
+}
+
+.letter-spacing-1 {
+    letter-spacing: 1px;
+}
+
+/* Elegant Paragraphs for better readability */
+p {
+    color: var(--text-grey);
+    margin-bottom: 1.5rem;
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+    <rect x="25" y="25" width="450" height="450" fill="none" stroke="black" stroke-width="20" />
+    <text x="250" y="220" font-family="'Helvetica', sans-serif" font-weight="bold" font-size="60" fill="black" text-anchor="middle" letter-spacing="5">WOODEN</text>
+    
+    <!-- OAK with stylized O -->
+    <!-- O (tree ring) -->
+    <g transform="translate(195, 290)">
+        <circle cx="0" cy="0" r="28" fill="white" stroke="black" stroke-width="4"/>
+        <circle cx="0" cy="0" r="20" fill="none" stroke="black" stroke-width="2"/>
+        <circle cx="0" cy="0" r="12" fill="none" stroke="black" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="4" fill="black" />
+        <!-- Slight texture lines -->
+        <path d="M0,-28 L0,-20 M0,20 L0,28 M-28,0 L-20,0 M20,0 L28,0" stroke="black" stroke-width="2" />
+    </g>
+    <!-- A -->
+    <text x="250" y="300" font-family="'Helvetica', sans-serif" font-weight="bold" font-size="60" fill="black" text-anchor="middle" letter-spacing="5">AK</text>
+    <!-- Adjusting spacing for OAK -->
+
+    <text x="250" y="380" font-family="'Helvetica', sans-serif" font-weight="bold" font-size="60" fill="black" text-anchor="middle" letter-spacing="5">STUDIO</text>
+    
+    <!-- Corner accent as seen in user image -->
+    <path d="M70,475 A50,50 0 0,1 25,430" fill="none" stroke="black" stroke-width="10" />
+</svg>
