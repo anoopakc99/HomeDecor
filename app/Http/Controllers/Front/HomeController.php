@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
-
 use App\Models\Slider;
+use App\Models\HomeSetting;
 
 class HomeController extends Controller
 {
@@ -24,13 +24,31 @@ class HomeController extends Controller
                 })->take(8)->get();
         });
 
-        $bestsellers = \Illuminate\Support\Facades\Cache::remember('home_bestsellers', 3600, function () {
-            return Product::with('category.parent')
+        $bestsellers = \Illuminate\Support\Facades\Cache::remember('home_bestsellers', 300, function () {
+            // Get bestsellers first; if fewer than 8, fill with latest products
+            $bestsellers = Product::with('category.parent')
                 ->where('is_bestseller', true)
-                ->take(4)
+                ->latest()
+                ->take(8)
                 ->get();
+
+            if ($bestsellers->count() < 8) {
+                $existingIds = $bestsellers->pluck('id')->toArray();
+                $remaining = Product::with('category.parent')
+                    ->whereNotIn('id', $existingIds)
+                    ->latest()
+                    ->take(8 - $bestsellers->count())
+                    ->get();
+                $bestsellers = $bestsellers->concat($remaining);
+            }
+
+            return $bestsellers;
         });
 
-        return view('front.home', compact('categories', 'bestsellers', 'sliders'));
+        $settings = \Illuminate\Support\Facades\Cache::remember('home_settings', 3600, function () {
+            return HomeSetting::allAsArray();
+        });
+
+        return view('front.home', compact('categories', 'bestsellers', 'sliders', 'settings'));
     }
 }

@@ -17,6 +17,7 @@ class Product extends Model
         'description',
         'dimensions',
         'material',
+        'warranty',
         'image',
         'is_bestseller',
     ];
@@ -34,5 +35,10 @@ class Product extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
     }
 }

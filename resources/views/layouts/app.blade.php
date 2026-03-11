@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Custom CSS -->
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -21,132 +23,157 @@
 
     <!-- Header -->
     <nav class="navbar navbar-expand-lg sticky-top shadow-sm py-2">
-        <div class="container-fluid px-4 px-lg-5">
-            <a class="navbar-brand d-flex align-items-center me-auto" href="{{ route('home') }}">
-                <img src="{{ asset('images/docor.logonew.jpeg') }}" alt="Wooden Oak Studio" class="img-fluid"
-                    style="max-height: 50px; width: auto;">
+        <div class="container-fluid ps-2 ps-md-4 pe-4 pe-lg-5">
+            <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                <img src="{{ asset('images/docor.logonew.jpeg') }}" alt="Wooden Oak Studio"
+                    class="img-fluid navbar-logo" style="max-height: 46px; width: auto;">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Shop All</a></li>
+                <!-- Main Navigation Links -->
+                <ul class="navbar-nav me-auto ms-lg-5 align-items-center">
+                    <li class="nav-item"><a class="nav-link fw-medium" href="{{ route('home') }}">Home</a></li>
 
-                    @if(isset($navbarCategories))
-                        @foreach($navbarCategories as $category)
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown{{ $category->id }}"
-                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ $category->name }}
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown{{ $category->id }}">
-                                    @foreach($category->children as $child)
-                                        <li><a class="dropdown-item ajax-link"
-                                                href="{{ route('products.index', ['category' => $child->slug]) }}">{{ $child->name }}</a>
-                                        </li>
-                                    @endforeach
-                                    <li>
-                                        <hr class="dropdown-divider">
+                    <!-- Products Dropdown (keeps submenu) -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle fw-medium" href="#" id="productsDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Products
+                        </a>
+                        <ul class="dropdown-menu border-0 shadow-sm" aria-labelledby="productsDropdown">
+                            @if(isset($navbarCategories))
+                                @foreach($navbarCategories as $category)
+                                    <li><a class="dropdown-item py-2"
+                                            href="{{ route('products.index', ['category' => $category->slug]) }}">{{ $category->name }}</a>
                                     </li>
-                                    <li><a class="dropdown-item ajax-link"
-                                            href="{{ route('products.index', ['category' => $category->slug]) }}">All
-                                            {{ $category->name }}</a></li>
-                                </ul>
+                                @endforeach
+                            @endif
+                            <li>
+                                <hr class="dropdown-divider">
                             </li>
-                        @endforeach
-                    @endif
-                    <li class="nav-item"><a class="nav-link" href="{{ route('cart.index') }}">Cart <span
-                                class="badge bg-secondary" id="cart-count">
+                            <li><a class="dropdown-item py-2" href="{{ route('products.index') }}">View All</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Bestsellers (simple link) -->
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium"
+                            href="{{ route('products.index', ['bestseller' => 1]) }}">Bestsellers</a>
+                    </li>
+
+                    <!-- Corporate Gifting (simple link) -->
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium" href="#">Corporate Gifting</a>
+                    </li>
+
+                    <!-- Gift Shop (simple link) -->
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium" href="#">Gift Shop</a>
+                    </li>
+
+                    <!-- About (simple link) -->
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium" href="#">About</a>
+                    </li>
+                </ul>
+
+                <!-- Right Side Icons -->
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="header-icon-link" href="{{ route('cart.index') }}" title="Cart">
+                            <i class="bi bi-bag"></i>
+                            <span class="cart-badge-new" id="cart-count">
                                 @auth
                                     {{ \App\Models\Cart::where('user_id', Auth::id())->count() }}
                                 @else
                                     0
                                 @endauth
-                            </span></a>
+                            </span>
+                        </a>
                     </li>
                     @guest
-                        <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
+                        <li class="nav-item">
+                            <a class="header-icon-link" href="{{ route('login') }}" title="Login">
+                                <i class="bi bi-person"></i>
+                            </a>
+                        </li>
                     @else
-                            <li class="nav-item dropdown me-3">
-                                <a class="nav-link dropdown-toggle hidden-arrow" href="#" id="navbarNotificationLink"
-                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                        class="bi bi-bell" viewBox="0 0 16 16">
-                                        <path
-                                            d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
-                                    </svg>
-                                    @php
-                                        // Filter: Show Unread OR Read within last 5 minutes
-                                        $notifications = Auth::user()->notifications->filter(function ($n) {
-                                            return is_null($n->read_at) || $n->read_at->gt(now()->subMinutes(5));
-                                        });
-                                        // Count logic: Use the count of displayed notifications
-                                        $unreadCount = $notifications->count();
-                                    @endphp
-                                    @if($unreadCount > 0)
-                                        <span class="badge rounded-pill bg-danger"
-                                            style="position: absolute; top: 0px; right: 0px; font-size: 0.6rem;">{{ $unreadCount }}</span>
-                                    @endif
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarNotificationLink"
-                                    style="width: 320px; max-height: 400px; overflow-y: auto;">
+                        <li class="nav-item dropdown me-3">
+                            <a class="nav-link dropdown-toggle hidden-arrow" href="#" id="navbarNotificationLink"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                    class="bi bi-bell" viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                                </svg>
+                                @php
+                                    $notifications = Auth::user()->notifications->filter(function ($n) {
+                                        return is_null($n->read_at) || $n->read_at->gt(now()->subMinutes(5));
+                                    });
+                                    $unreadCount = $notifications->count();
+                                @endphp
+                                @if($unreadCount > 0)
+                                    <span class="badge rounded-pill bg-danger"
+                                        style="position: absolute; top: 0px; right: 0px; font-size: 0.6rem;">{{ $unreadCount }}</span>
+                                @endif
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarNotificationLink"
+                                style="width: 320px; max-height: 400px; overflow-y: auto;">
+                                <li>
+                                    <h6 class="dropdown-header fw-bold">Notifications</h6>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider my-0">
+                                </li>
+                                @forelse($notifications as $notification)
                                     <li>
-                                        <h6 class="dropdown-header fw-bold">Notifications</h6>
+                                        <a class="dropdown-item py-2 {{ $notification->read_at ? '' : 'bg-light' }}"
+                                            href="{{ route('user.notifications.read', $notification->id) }}"
+                                            style="white-space: normal;">
+                                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                                <strong
+                                                    class="small text-primary">{{ ucfirst(str_replace('_', ' ', $notification->data['type'] ?? 'Notification')) }}</strong>
+                                                <span class="text-muted"
+                                                    style="font-size: 0.7rem;">{{ $notification->created_at->diffForHumans() }}</span>
+                                            </div>
+                                            <p class="mb-0 small text-muted">
+                                                {{ \Illuminate\Support\Str::limit($notification->data['message'] ?? '', 80) }}
+                                            </p>
+                                        </a>
                                     </li>
                                     <li>
                                         <hr class="dropdown-divider my-0">
                                     </li>
-                                    @forelse($notifications as $notification)
-                                        <li>
-                                            <a class="dropdown-item py-2 {{ $notification->read_at ? '' : 'bg-light' }}"
-                                                href="{{ route('user.notifications.read', $notification->id) }}"
-                                                style="white-space: normal;">
-                                                <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                                                    <strong
-                                                        class="small text-primary">{{ ucfirst(str_replace('_', ' ', $notification->data['type'] ?? 'Notification')) }}</strong>
-                                                    <span class="text-muted"
-                                                        style="font-size: 0.7rem;">{{ $notification->created_at->diffForHumans() }}</span>
-                                                </div>
-                                                <p class="mb-0 small text-muted">
-                                                    {{ \Illuminate\Support\Str::limit($notification->data['message'] ?? '', 80) }}
-                                                </p>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <hr class="dropdown-divider my-0">
-                                        </li>
-                                    @empty
-                                        <li class="p-4 text-center text-muted small">No recent notifications.</li>
-                                    @endforelse
-                                    @if($notifications->count() > 0)
-                                        <li><a class="dropdown-item text-center small text-primary fw-bold py-2"
-                                                href="{{ route('user.notifications.markAllRead') }}">Mark all as read</a></li>
-                                    @endif
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" id="userDropdown"
-                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="d-inline-block text-truncate"
-                                        style="max-width: 150px;">{{ Auth::user()->name }}</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li><a class="dropdown-item" href="{{ route('user.dashboard') }}">My Profile</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('user.orders') }}">My Orders</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('user.helpline') }}">Helpline</a></li>
-                                    <li></li>
-                            </li>
-                            <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form action="{{ route('user.logout') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">Logout</button>
-                                </form>
-                            </li>
-                        </ul>
+                                @empty
+                                    <li class="p-4 text-center text-muted small">No recent notifications.</li>
+                                @endforelse
+                                @if($notifications->count() > 0)
+                                    <li><a class="dropdown-item text-center small text-primary fw-bold py-2"
+                                            href="{{ route('user.notifications.markAllRead') }}">Mark all as read</a></li>
+                                @endif
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="header-icon-link dropdown-toggle" href="#" id="userDropdown"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="{{ route('user.dashboard') }}">My Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ route('user.orders') }}">My Orders</a></li>
+                                <li><a class="dropdown-item" href="{{ route('user.helpline') }}">Helpline</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <form action="{{ route('user.logout') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
                         </li>
                     @endguest
                 </ul>
@@ -193,31 +220,79 @@
     </div>
 
     <!-- Footer -->
-    <footer class="py-5 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <img src="{{ asset('images/docor.logonew.jpeg') }}" alt="Wooden Oak Studio" class="mb-3 img-fluid"
-                        style="max-height: 60px; width: auto;">
-                    <h5 class="visually-hidden">Wooden Oak Studio</h5>
-                    <p>Premium handcrafted wooden furniture for your home.</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ route('products.index') }}">Shop</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Contact</h5>
-                    <p>Email: support@woodenoak.com</p>
-                    <p>Phone: +91 98765 43210</p>
+    <footer class="site-footer pt-0 mt-5">
+        <div class="footer-main py-5">
+            <div class="container">
+                <div class="row g-4">
+                    <!-- Brand Column -->
+                    <div class="col-lg-4 col-md-6">
+                        <img src="{{ asset('images/docor.logonew.jpeg') }}" alt="Wooden Oak Studio"
+                            class="mb-3 img-fluid" style="max-height: 50px; width: auto;">
+                        <p class="footer-desc mt-2 mb-4" style="font-size: 0.9rem; line-height: 1.8; color: #777;">
+                            Premium handcrafted wooden furniture designed for modern living. Each piece is made with
+                            ethically sourced wood by skilled Indian artisans.
+                        </p>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="footer-social-icon"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="footer-social-icon"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="footer-social-icon"><i class="bi bi-twitter-x"></i></a>
+                            <a href="#" class="footer-social-icon"><i class="bi bi-pinterest"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="col-lg-2 col-md-6 col-6">
+                        <h6 class="footer-heading">Quick Links</h6>
+                        <ul class="list-unstyled footer-links">
+                            <li><a href="{{ route('home') }}">Home</a></li>
+                            <li><a href="{{ route('products.index') }}">Shop</a></li>
+                            <li><a href="#">Bestsellers</a></li>
+                            <li><a href="#">About Us</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Customer Service -->
+                    <div class="col-lg-3 col-md-6 col-6">
+                        <h6 class="footer-heading">Customer Service</h6>
+                        <ul class="list-unstyled footer-links">
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Shipping & Returns</a></li>
+                            <li><a href="#">FAQs</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="col-lg-3 col-md-6">
+                        <h6 class="footer-heading">Get In Touch</h6>
+                        <ul class="list-unstyled footer-contact">
+                            <li class="d-flex align-items-start mb-2">
+                                <i class="bi bi-envelope me-2 mt-1" style="font-size: 0.85rem; color: #999;"></i>
+                                <span>support@woodenoak.com</span>
+                            </li>
+                            <li class="d-flex align-items-start mb-2">
+                                <i class="bi bi-telephone me-2 mt-1" style="font-size: 0.85rem; color: #999;"></i>
+                                <span>+91 98765 43210</span>
+                            </li>
+                            <li class="d-flex align-items-start mb-2">
+                                <i class="bi bi-geo-alt me-2 mt-1" style="font-size: 0.85rem; color: #999;"></i>
+                                <span>India</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="text-center mt-3">
-                <p>&copy; {{ date('Y') }} Wooden Oak Studio. All rights reserved.</p>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="footer-bottom py-3" style="border-top: 1px solid #e5e5e5; background: #f5f5f5;">
+            <div class="container">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                    <p class="mb-0 small" style="color: #999;">&copy; {{ date('Y') }} Wooden Oak Studio. All rights
+                        reserved.</p>
+                    <p class="mb-0 small" style="color: #999;">Crafted with <i class="bi bi-heart-fill"
+                            style="color: #c0392b; font-size: 0.7rem;"></i> in India</p>
+                </div>
             </div>
         </div>
     </footer>

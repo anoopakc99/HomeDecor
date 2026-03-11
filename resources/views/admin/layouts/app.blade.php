@@ -106,6 +106,16 @@
                 </svg>
                 Support Tickets
             </a>
+
+            <a href="{{ route('admin.home-settings.index') }}"
+                class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors {{ request()->routeIs('admin.home-settings.*') ? 'bg-slate-100 text-slate-900 font-semibold' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Home Settings
+            </a>
         </nav>
 
         <div class="p-4 border-t border-slate-100 bg-white">
@@ -129,7 +139,7 @@
     <div id="main-content-wrapper" class="flex flex-col min-h-screen transition-all duration-300 md:ml-64">
         <!-- Top Header -->
         <header
-            class="h-16 bg-white shadow-sm flex items-center justify-between px-4 sticky top-0 z-40 border-b border-slate-100">
+            class="h-16 bg-white shadow-sm flex items-center justify-between px-4 sticky top-0 z-50 border-b border-slate-100 flex-shrink-0">
             <div class="flex items-center space-x-4">
                 <!-- Mobile & Desktop Sidebar Toggle -->
                 <button onclick="toggleSidebar()"
@@ -248,29 +258,24 @@
                 }
             } else {
                 // Desktop behavior: Toggle width and margin
-                // We'll use a class 'collapsed' on the sidebar
-                if (sidebar.classList.contains('w-64')) {
-                    // Collapse
-                    sidebar.classList.remove('w-64');
-                    sidebar.classList.add('w-20');
-
-                    // Hide text spans
-                    document.querySelectorAll('#sidebar nav a span, #sidebar .uppercase, #sidebar button span').forEach(el => el.classList.add('hidden'));
-
-                    // Adjust main content
-                    mainContent.classList.remove('md:ml-64');
-                    mainContent.classList.add('md:ml-20');
-                } else {
+                if (sidebar.style.width === '5rem') {
                     // Expand
-                    sidebar.classList.remove('w-20');
-                    sidebar.classList.add('w-64');
+                    sidebar.style.width = '16rem'; // w-64
 
                     // Show text spans
-                    document.querySelectorAll('#sidebar nav a span, #sidebar .uppercase, #sidebar button span').forEach(el => el.classList.remove('hidden'));
+                    document.querySelectorAll('#sidebar nav a span, #sidebar .uppercase, #sidebar button span').forEach(el => el.style.display = '');
 
                     // Adjust main content
-                    mainContent.classList.remove('md:ml-20');
-                    mainContent.classList.add('md:ml-64');
+                    mainContent.style.marginLeft = '16rem'; // md:ml-64
+                } else {
+                    // Collapse
+                    sidebar.style.width = '5rem'; // w-20
+
+                    // Hide text spans
+                    document.querySelectorAll('#sidebar nav a span, #sidebar .uppercase, #sidebar button span').forEach(el => el.style.display = 'none');
+
+                    // Adjust main content
+                    mainContent.style.marginLeft = '5rem'; // md:ml-20
                 }
             }
         }

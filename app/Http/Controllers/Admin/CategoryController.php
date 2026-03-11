@@ -44,7 +44,7 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'parent_id' => 'nullable|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp,tiff|max:51200',
         ]);
 
         $data = $request->only(['name', 'parent_id']);
@@ -63,15 +63,21 @@ class CategoryController extends Controller
                 $filename = time() . '.webp';
                 $fullPath = $path . '/' . $filename;
 
-                // Compress and save
-                $manager = new ImageManager(new Driver());
-                $img = $manager->read($image->getRealPath());
+                $originalMemory = ini_get('memory_limit');
+                ini_set('memory_limit', '512M');
 
-                // Resize if width > 800, constrain aspect ratio
-                $img->scale(width: 800);
+                try {
+                    $manager = new ImageManager(new Driver());
+                    $img = $manager->read($image->getRealPath());
+                    $img->scale(width: 800);
 
-                // Save with 75% quality to reduce size
-                $img->save($fullPath, quality: 75);
+                    $img->toWebp(quality: 95)->save($fullPath);
+                } catch (\Exception $e) {
+                    $filename = time() . '.' . $image->getClientOriginalExtension();
+                    $image->move($path, $filename);
+                } finally {
+                    ini_set('memory_limit', $originalMemory);
+                }
             } else {
                 $filename = time() . '.' . $image->getClientOriginalExtension();
                 $image->move($path, $filename);
@@ -98,7 +104,7 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'parent_id' => 'nullable|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp,tiff|max:51200',
         ]);
 
         $data = $request->only(['name', 'parent_id']);
@@ -121,10 +127,29 @@ class CategoryController extends Controller
                 $filename = time() . '.webp';
                 $fullPath = $path . '/' . $filename;
 
-                $manager = new ImageManager(new Driver());
-                $img = $manager->read($image->getRealPath());
-                $img->scale(width: 800);
-                $img->save($fullPath, quality: 75);
+                $originalMemory = ini_get('memory_limit');
+                ini_set('memory_limit', '512M');
+
+                try {
+                    $manager = new ImageManager(new Driver());
+                    $img = $manager->read($image->getRealPath());
+                    $img->scale(width: 800);
+
+                    $fileSize = $image->getSize();
+                    $quality = 82;
+                    if ($fileSize > 15 * 1024 * 1024) {
+                        $quality = 75;
+                    } elseif ($fileSize > 8 * 1024 * 1024) {
+                        $quality = 78;
+                    }
+
+                    $img->toWebp(quality: $quality)->save($fullPath);
+                } catch (\Exception $e) {
+                    $filename = time() . '.' . $image->getClientOriginalExtension();
+                    $image->move($path, $filename);
+                } finally {
+                    ini_set('memory_limit', $originalMemory);
+                }
             } else {
                 $filename = time() . '.' . $image->getClientOriginalExtension();
                 $image->move($path, $filename);

@@ -1,7 +1,7 @@
 @extends(request()->ajax() ? 'layouts.ajax' : 'layouts.app')
 
 @section('content')
-    <div class="container py-5">
+    <div class="container-fluid px-3 py-5">
         <div class="row">
             <!-- Sidebar Filter -->
             <div class="col-md-3 mb-4">
@@ -32,7 +32,7 @@
                 </h2>
 
                 @if($products->count() > 0)
-                    <div class="row g-4">
+                    <div class="row g-2">
                         @foreach($products as $product)
                             <div class="col-md-4">
                                 @include('front.products.card', ['product' => $product])

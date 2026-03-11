@@ -15,6 +15,7 @@ use App\Http\Controllers\Front\OrderController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::post('/product/{product}/review', [\App\Http\Controllers\Front\ProductReviewController::class, 'store'])->name('reviews.store');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
@@ -60,6 +61,7 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Admin\HomeSettingController;
 
 Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
@@ -75,6 +77,9 @@ Route::middleware(['auth', 'admin', 'prevent-back-history'])->prefix('admin')->n
     Route::resource('orders', AdminOrderController::class);
     Route::get('/support', [App\Http\Controllers\Admin\SupportController::class, 'index'])->name('support.index');
     Route::patch('/support/{id}/status', [App\Http\Controllers\Admin\SupportController::class, 'updateStatus'])->name('support.updateStatus');
+    // Home Settings
+    Route::get('/home-settings', [HomeSettingController::class, 'index'])->name('home-settings.index');
+    Route::put('/home-settings', [HomeSettingController::class, 'update'])->name('home-settings.update');
 });
 
 // Temporary Route for Shared Hosting Optimization

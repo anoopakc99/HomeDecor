@@ -3,7 +3,7 @@
 @section('title', 'Edit Product')
 
 @section('content')
-    <div class="card max-w-4xl mx-auto">
+    <div class="card max-w-4xl mx-auto mt-6">
         <div class="card-header border-b border-slate-100 p-6 flex justify-between items-center">
             <h3 class="text-lg font-bold text-slate-800">Edit Product: {{ $product->name }}</h3>
             <a href="{{ route('admin.products.index') }}" class="text-sm text-slate-500 hover:text-slate-700">Back to
@@ -61,6 +61,15 @@
                         <input type="text" name="material" id="material"
                             class="w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm p-2 border"
                             value="{{ old('material', $product->material) }}" placeholder="e.g. Wood, Metal">
+                    </div>
+
+                    <div>
+                        <label for="warranty" class="block text-sm font-medium text-slate-700 mb-1">Warranty
+                            (Optional)</label>
+                        <input type="text" name="warranty" id="warranty"
+                            class="w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm p-2 border"
+                            value="{{ old('warranty', $product->warranty) }}"
+                            placeholder="e.g. 1 Year Warranty, Lifetime Warranty">
                     </div>
 
                     <div class="flex items-center mt-6">

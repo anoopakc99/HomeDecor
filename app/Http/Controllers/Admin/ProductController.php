@@ -47,8 +47,9 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'warranty' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp,tiff|max:51200',
+            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp,tiff|max:51200',
         ]);
 
         $data = $request->except(['image', 'gallery']);
@@ -91,9 +92,10 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'gallery_replace.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'warranty' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp,tiff|max:51200',
+            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp,tiff|max:51200',
+            'gallery_replace.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp,tiff|max:51200',
         ]);
 
         $data = $request->except(['image', 'gallery', 'gallery_replace']);
@@ -169,21 +171,26 @@ class ProductController extends Controller
         }
 
         if (extension_loaded('gd')) {
-            // Generate a unique filename with .webp extension
             $filename = time() . '_' . uniqid() . '.webp';
             $fullPath = $path . '/' . $filename;
 
-            $manager = new ImageManager(new Driver());
-            $img = $manager->read($file->getRealPath());
+            $originalMemory = ini_get('memory_limit');
+            ini_set('memory_limit', '512M');
 
-            // High Quality Resize logic tailored for e-commerce
-            // 1200px is good for zoom capabilities while keeping file size low
-            $img->scaleDown(width: 1200);
+            try {
+                $manager = new ImageManager(new Driver());
+                $img = $manager->read($file->getRealPath());
 
-            // Encode to WebP with 80% quality (best balance)
-            $img->toWebp(quality: 80)->save($fullPath);
+                $img->scaleDown(width: 1200);
+
+                $img->toWebp(quality: 95)->save($fullPath);
+            } catch (\Exception $e) {
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+            } finally {
+                ini_set('memory_limit', $originalMemory);
+            }
         } else {
-            // Fallback: Use original extension and just move the file
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move($path, $filename);
         }

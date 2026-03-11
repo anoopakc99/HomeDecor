@@ -25,7 +25,7 @@ class SliderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp,bmp,tiff|max:51200',
             'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'link' => 'nullable|url',
@@ -53,7 +53,7 @@ class SliderController extends Controller
     public function update(Request $request, Slider $slider)
     {
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,bmp,tiff|max:51200',
             'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'link' => 'nullable|url',
@@ -99,12 +99,28 @@ class SliderController extends Controller
             $filename = time() . '_' . uniqid() . '.webp';
             $fullPath = $path . '/' . $filename;
 
-            $manager = new ImageManager(new Driver());
-            $img = $manager->read($file->getRealPath());
+            // Increase memory limit for large image processing
+            $originalMemory = ini_get('memory_limit');
+            ini_set('memory_limit', '512M');
 
-            // Resize for slider (e.g. 1920x800 approx)
-            $img->scale(width: 1920);
-            $img->toWebp(quality: 80)->save($fullPath);
+            try {
+                $manager = new ImageManager(new Driver());
+                $img = $manager->read($file->getRealPath());
+
+                // Auto-resize: max width 1920px, maintain aspect ratio
+                $img->scale(width: 1920);
+
+                // Quality 95% — preserves original colors, brightness & sharpness perfectly
+                // WebP format itself provides excellent compression even at 95%
+                $img->toWebp(quality: 95)->save($fullPath);
+            } catch (\Exception $e) {
+                // Fallback: save original file if processing fails
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move($path, $filename);
+                return 'sliders/' . $filename;
+            } finally {
+                ini_set('memory_limit', $originalMemory);
+            }
 
             return 'sliders/' . $filename;
         } else {
